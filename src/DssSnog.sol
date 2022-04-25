@@ -4,7 +4,6 @@ pragma solidity ^0.8.12;
 // Includes Median and OSM functions
 interface OracleLike {
     function kiss(address) external;
-    function kiss(address[] calldata) external;
 }
 
 contract DssSnog {
@@ -20,9 +19,7 @@ contract DssSnog {
 
     mapping (address => uint256) public snoggers;
     function snogon(address usr)  external auth { snoggers[usr] = 1; emit SnogOn(usr);}
-    function snogoff(address usr) external can {
-        snoggers[usr] = 0;
-        emit SnogOff(usr);
+    function snogoff(address usr) external can { snoggers[usr] = 0; emit SnogOff(usr);
     }
     modifier can {
         require(wards[msg.sender] == 1 || snoggers[msg.sender] == 1, "DssSnog/not-authorized");
