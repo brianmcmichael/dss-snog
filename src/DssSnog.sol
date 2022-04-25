@@ -29,7 +29,6 @@ contract DssSnog {
         _;
     }
 
-
     event Rely(address indexed usr);
     event Deny(address indexed usr);
     event SnogOn(address indexed usr);
