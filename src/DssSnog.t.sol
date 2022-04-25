@@ -20,6 +20,12 @@ contract AuthUser {
     constructor(DssSnog _snogger) {
         snogger = _snogger;
     }
+    function snogon(address u) external {
+        snogger.snogon(u);
+    }
+    function snogoff(address u) external {
+        snogger.snogoff(u);
+    }
     function kiss(address o, address r) external {
         snogger.kiss(o, r);
     }
@@ -29,6 +35,7 @@ interface OracleTester {
     function rely(address) external;
     function deny(address) external;
     function wards(address) external view returns (uint256);
+    function bud(address) external view returns (uint256);
     function peek() external view returns (bytes32, bool);
     function peep() external view returns (bytes32, bool);
     function read() external view returns (bytes32);
@@ -40,15 +47,16 @@ contract Reader {
         require(has);
         return uint256(val);
     }
-
     function peep(address _oracle) external view returns (uint256) {
         (bytes32 val, bool has) = OracleTester(_oracle).peep();
         require(has);
         return uint256(val);
     }
-
     function read(address _oracle) external view returns (uint256) {
         return uint256(OracleTester(_oracle).read());
+    }
+    function bud(address _oracle) external view returns (uint256) {
+        return OracleTester(_oracle).bud(address(this));
     }
 }
 
@@ -81,7 +89,7 @@ contract DssSnogTest is DSTest {
         crvlposm = gaddr("PIP_CRVV1ETHSTETH");
 
         // Prospective user must be authed to add
-        snogger.rely(address(grantor));
+        snogger.snogon(address(grantor));
 
         // Snogger must be relied on oracles for access
         // OSM
@@ -97,22 +105,24 @@ contract DssSnogTest is DSTest {
 
     function testKissOne() public {
 
+        assertEq(reader.bud(osm), 0);
         grantor.kiss(osm, address(reader));
-
+        assertEq(reader.bud(osm), 1);
         assertTrue(reader.peek(osm) > 0);
         assertTrue(reader.peep(osm) > 0);
         assertTrue(reader.read(osm) > 0);
 
-
+        assertEq(reader.bud(unilposm), 0);
         grantor.kiss(unilposm, address(reader));
-
+        assertEq(reader.bud(unilposm), 1);
         assertTrue(reader.peek(unilposm) > 0);
         assertTrue(reader.peep(unilposm) > 0);
         assertTrue(reader.read(unilposm) > 0);
 
-        // TODO: test against live crv oracle or fixture
+        // TODO: test against live crv oracle or fixture (when live)
+        //assertEq(reader.bud(crvlposm), 0);
         //grantor.kiss(crvlposm, address(reader));
-
+        //assertEq(reader.bud(crvlposm), 1);
         //assertTrue(reader.peek(crvlposm) > 0);
         //assertTrue(reader.peep(crvlposm) > 0);
         //assertTrue(reader.read(crvlposm) > 0);
@@ -126,6 +136,38 @@ contract DssSnogTest is DSTest {
     function testFailNotReader() public view {
         // ensure we can't read normally
         reader.peek(osm);
+    }
+
+    function testSnogOn() public {
+        // Set in setup
+        assertEq(snogger.snoggers(address(grantor)), 1);
+        assertEq(snogger.snoggers(address(reader)), 0);
+
+        snogger.snogon(address(reader));
+
+        assertEq(snogger.snoggers(address(reader)), 1);
+    }
+
+    function testWardSnogOff() public {
+        // Set in setup
+        assertEq(snogger.snoggers(address(grantor)), 1);
+
+        snogger.snogoff(address(grantor));  // ward
+
+        assertEq(snogger.snoggers(address(grantor)), 0);
+    }
+
+    function testSelfSnogOff() public {
+        // Set in setup
+        assertEq(snogger.snoggers(address(grantor)), 1);
+
+        grantor.snogoff(address(grantor));  // self
+
+        assertEq(snogger.snoggers(address(grantor)), 0);
+    }
+
+    function testFailSnoggerCanNotCreateNewSnoggers() public {
+        grantor.snogon(address(reader));
     }
 
     function gaddr(bytes32 key) internal view returns (address val) {
