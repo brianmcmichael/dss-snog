@@ -4,7 +4,7 @@ Oracle whitelisting for permissioned users.
 
 ## Requirements
 
-* Foundry
+* [Foundry](https://github.com/foundry-rs/foundry)
 
 ## Usage
 
