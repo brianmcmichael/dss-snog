@@ -18,9 +18,8 @@ contract DssSnog {
     }
 
     mapping (address => uint256) public snoggers;
-    function dub(address usr)  external auth { snoggers[usr] = 1; emit Dub(usr);}
-    function snub(address usr) external can { snoggers[usr] = 0; emit Snub(usr);
-    }
+    function dub(address usr)  external auth { snoggers[usr] = 1; emit Dub(usr); }
+    function snub(address usr) external can { snoggers[usr] = 0; emit Snub(usr); }
     modifier can {
         require(wards[msg.sender] == 1 || snoggers[msg.sender] == 1, "DssSnog/not-authorized");
         _;
