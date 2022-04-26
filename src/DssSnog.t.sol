@@ -20,11 +20,11 @@ contract AuthUser {
     constructor(DssSnog _snogger) {
         snogger = _snogger;
     }
-    function snogon(address u) external {
-        snogger.snogon(u);
+    function dub(address u) external {
+        snogger.dub(u);
     }
-    function snogoff(address u) external {
-        snogger.snogoff(u);
+    function snub(address u) external {
+        snogger.snub(u);
     }
     function kiss(address o, address r) external {
         snogger.kiss(o, r);
@@ -89,7 +89,7 @@ contract DssSnogTest is DSTest {
         crvlposm = gaddr("PIP_CRVV1ETHSTETH");
 
         // Prospective user must be authed to add
-        snogger.snogon(address(grantor));
+        snogger.dub(address(grantor));
 
         // Snogger must be relied on oracles for access
         // OSM
@@ -138,36 +138,36 @@ contract DssSnogTest is DSTest {
         reader.peek(osm);
     }
 
-    function testSnogOn() public {
+    function testDub() public {
         // Set in setup
         assertEq(snogger.snoggers(address(grantor)), 1);
         assertEq(snogger.snoggers(address(reader)), 0);
 
-        snogger.snogon(address(reader));
+        snogger.dub(address(reader));
 
         assertEq(snogger.snoggers(address(reader)), 1);
     }
 
-    function testWardSnogOff() public {
+    function testWardSnub() public {
         // Set in setup
         assertEq(snogger.snoggers(address(grantor)), 1);
 
-        snogger.snogoff(address(grantor));  // ward
+        snogger.snub(address(grantor));  // ward
 
         assertEq(snogger.snoggers(address(grantor)), 0);
     }
 
-    function testSelfSnogOff() public {
+    function testSelfSnub() public {
         // Set in setup
         assertEq(snogger.snoggers(address(grantor)), 1);
 
-        grantor.snogoff(address(grantor));  // self
+        grantor.snub(address(grantor));  // self
 
         assertEq(snogger.snoggers(address(grantor)), 0);
     }
 
     function testFailSnoggerCanNotCreateNewSnoggers() public {
-        grantor.snogon(address(reader));
+        grantor.dub(address(reader));
     }
 
     function gaddr(bytes32 key) internal view returns (address val) {
